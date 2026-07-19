@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeLab Systems – Management Portal</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .sidebar { min-width: 240px; }
+    .glass { background: rgba(255,255,255,0.82); backdrop-filter: blur(8px); }
+    .section { display:none; }
+    .section.active { display:block; }
+    code { font-size: 0.85rem; }
+    textarea { width: 100%; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-900">
+  <div class="min-h-screen flex">
+    <aside class="sidebar bg-slate-900 text-white p-4 flex flex-col gap-3 shadow-xl">
+      <div class="text-2xl font-bold mb-4">CodeLab Systems</div>
+      <nav class="flex flex-col gap-2 text-sm">
+        <button onclick="showSection('login')" class="text-left hover:bg-slate-800 px-3 py-2 rounded">Login</button>
+        <button onclick="showSection('dashboard')" class="text-left hover:bg-slate-800 px-3 py-2 rounded">Dashboard</button>
+        <button onclick="showSection('employees')" class="text-left hover:bg-slate-800 px-3 py-2 rounded">Employee Directory</button>
+        <button onclick="showSection('employeeProfile')" class="text-left hover:bg-slate-800 px-3 py-2 rounded">Employee Profile</button>
+        <button onclick="showSection('patchMgmt')" class="text-left hover:bg-slate-800 px-3 py-2 rounded">Patch Management</button>
+        <button onclick="showSection('systemHealth')" class="text-left hover:bg-slate-800 px-3 py-2 rounded">System Health</button>
+        <button onclick="showSection('settings')" class="text-left hover:bg-slate-800 px-3 py-2 rounded">Settings</button>
+        <button onclick="showSection('reports')" class="text-left hover:bg-slate-800 px-3 py-2 rounded">Reports</button>
+        <button onclick="showSection('help')" class="text-left hover:bg-slate-800 px-3 py-2 rounded">Help Center</button>
+        <button onclick="showSection('about')" class="text-left hover:bg-slate-800 px-3 py-2 rounded">About</button>
+      </nav>
+      <div class="text-xs text-slate-400 pt-4 border-t border-slate-800">Production Build</div>
+    </aside>
+
+    <main class="flex-1 p-8 space-y-6">
+      <header class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold">Enterprise Employee & Patch Management Portal</h1>
+          <p class="text-slate-600">CodeLab Systems Internal Portal</p>
+        </div>
+        <div class="flex items-center gap-2 text-sm bg-white shadow px-4 py-2 rounded">
+          <span id="currentUser">Guest</span>
+          <button onclick="logoutUser()" class="bg-red-500 text-white px-3 py-1 rounded">Logout</button>
+        </div>
+      </header>
+
+      <section id="login" class="section active glass shadow p-6 rounded">
+        <h2 class="text-xl font-semibold mb-3">Login</h2>
+        <p class="text-sm text-slate-700 mb-3">Please authenticate to access portal features.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm">Username</label>
+            <input id="username" class="w-full border px-3 py-2 rounded" placeholder="Enter username" />
+          </div>
+          <div>
+            <label class="block text-sm">Password</label>
+            <input id="password" type="password" class="w-full border px-3 py-2 rounded" placeholder="Enter password" />
+          </div>
+        </div>
+        <div class="mt-4 flex items-center gap-3">
+          <button onclick="loginUser()" class="bg-blue-600 text-white px-4 py-2 rounded">Sign In</button>
+        </div>
+      </section>
+
+      <section id="dashboard" class="section glass shadow p-6 rounded">
+        <h2 class="text-xl font-semibold">Dashboard</h2>
+        <p class="text-sm text-slate-600">Displays organization announcements.</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <div class="bg-white shadow rounded p-4">
+            <p class="text-xs uppercase text-slate-500">Active Employees</p>
+            <p class="text-3xl font-bold" id="employeeCount">0</p>
+            <p class="text-xs text-slate-500">Synchronized</p>
+          </div>
+          <div class="bg-white shadow rounded p-4">
+            <p class="text-xs uppercase text-slate-500">Pending Patches</p>
+            <p class="text-3xl font-bold" id="pendingPatches">0</p>
+            <p class="text-xs text-slate-500">Scheduled maintenance window</p>
+          </div>
+          <div class="bg-white shadow rounded p-4">
+            <p class="text-xs uppercase text-slate-500">System Status</p>
+            <p class="text-3xl font-bold text-emerald-600">Nominal</p>
+            <p class="text-xs text-slate-500">All services operational</p>
+          </div>
+        </div>
+        <div class="mt-6">
+          <h3 class="font-semibold">Announcements</h3>
+          <div id="announcements" class="mt-2 text-sm bg-white p-3 rounded shadow"></div>
+        </div>
+      </section>
+
+      <section id="employees" class="section glass shadow p-6 rounded">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-semibold">Employee Directory</h2>
+          <input id="searchBox" class="border px-3 py-2 rounded" placeholder="Search name or email" onkeyup="searchEmployees(this.value)" />
+        </div>
+        <table class="w-full text-sm mt-4">
+          <thead class="bg-slate-200 text-slate-700">
+            <tr><th class="p-2 text-left">Name</th><th class="p-2 text-left">Email</th><th class="p-2 text-left">Phone</th><th class="p-2 text-left">Salary</th></tr>
+          </thead>
+          <tbody id="employeeTable" class="bg-white"></tbody>
+        </table>
+      </section>
+
+      <section id="employeeProfile" class="section glass shadow p-6 rounded">
+        <h2 class="text-xl font-semibold">Employee Profile</h2>
+        <p class="text-sm text-slate-600">Displays employee profile information.</p>
+        <div id="employeeProfileContent" class="bg-white p-4 rounded shadow"></div>
+      </section>
+
+      <section id="patchMgmt" class="section glass shadow p-6 rounded">
+        <h2 class="text-xl font-semibold">Patch Management</h2>
+        <p class="text-sm text-slate-600">Patches are scheduled automatically with operational notes.</p>
+        <div id="patchList" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"></div>
+        <div class="mt-4">
+          <textarea id="patchNote" rows="3" placeholder="Enter patch note to broadcast"></textarea>
+          <button onclick="broadcastPatchNote()" class="mt-2 bg-amber-500 text-white px-4 py-2 rounded">Broadcast Note</button>
+          <div id="patchBroadcast" class="mt-2 text-sm bg-white p-3 rounded shadow"></div>
+        </div>
+      </section>
+
+      <section id="systemHealth" class="section glass shadow p-6 rounded">
+        <h2 class="text-xl font-semibold">System Health Dashboard</h2>
+        <p class="text-sm text-slate-600">Live monitoring pulled from status nodes.</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <div class="bg-white p-4 rounded shadow">Web Cluster Status: Active</div>
+          <div class="bg-white p-4 rounded shadow">DB Cluster Status: Active</div>
+          <div class="bg-white p-4 rounded shadow">Patch Node Status: Active</div>
+        </div>
+        <div class="mt-4 text-sm">Health Feed: <span id="healthFeed"></span></div>
+      </section>
+
+      <section id="settings" class="section glass shadow p-6 rounded">
+        <h2 class="text-xl font-semibold">Settings & Configuration</h2>
+        <p class="text-sm text-slate-600">Configuration overview.</p>
+        <pre class="bg-white p-4 rounded shadow overflow-x-auto text-xs" id="configDump"></pre>
+      </section>
+
+      <section id="reports" class="section glass shadow p-6 rounded">
+        <h2 class="text-xl font-semibold">Reports</h2>
+        <p class="text-sm text-slate-600">Generate custom reports using specific parameters.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <div class="bg-white p-4 rounded shadow">
+            <label class="block text-sm">Report Filter Query</label>
+            <textarea id="reportScript" rows="6" class="border w-full p-2 rounded" placeholder="e.g., department=engineering"></textarea>
+            <button onclick="runReportScript()" class="mt-2 bg-emerald-600 text-white px-4 py-2 rounded">Generate Report</button>
+            <div id="reportResult" class="mt-2 text-sm"></div>
+          </div>
+          <div class="bg-white p-4 rounded shadow">
+            <label class="block text-sm">Target Field Selection</label>
+            <input id="reportEval" class="border w-full p-2 rounded" placeholder="e.g., email" />
+            <button onclick="evalReport()" class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded">View Field</button>
+            <div id="reportEvalResult" class="mt-2 text-sm"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="help" class="section glass shadow p-6 rounded">
+        <h2 class="text-xl font-semibold">Help Center</h2>
+        <p class="text-sm text-slate-600">For support, please open an internal ticket with the IT Security Operations team.</p>
+      </section>
+
+      <section id="about" class="section glass shadow p-6 rounded">
+        <h2 class="text-xl font-semibold">About</h2>
+        <p class="text-sm text-slate-600">CodeLab Systems – Enterprise Employee & Patch Management Portal.</p>
+        <div class="mt-4">
+          <h3 class="font-semibold mb-2">Repository History</h3>
+          <ul id="gitHistory" class="text-sm bg-white p-4 rounded shadow space-y-1"></ul>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/backup.js"></script>
+  <script src="js/legacy.js"></script>
+  <script src="js/admin_old.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/employee.js"></script>
+  <script src="js/patch.js"></script>
+  <script src="js/report.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/debug.js"></script>
+  <script>
+    function init() {
+      loadDashboard();
+      renderEmployees(EMPLOYEES);
+      renderPatches();
+      renderConfig();
+      loadEmployeeProfile();
+      renderHealthFeed();
+      renderGitHistory();
+      document.getElementById('currentUser').innerText = (JSON.parse(localStorage.getItem('authUser')||'{}').username) || 'Guest';
+      if (localStorage.getItem('authUser')) {
+        showSection('dashboard');
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

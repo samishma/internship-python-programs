@@ -1,0 +1,11 @@
+{
+  "cloudflareToken": "${CLOUDFLARE_TOKEN}",
+  "serviceAccountKey": "${SERVICE_ACCOUNT_KEY}",
+  "sessionSecret": "${SESSION_SECRET}",
+  "debugApiKey": "${DEBUG_API_KEY}",
+  "backupPassword": "${BACKUP_PASSWORD}",
+  "smtp": {
+    "host": "${SMTP_HOST}",
+    "user": "${SMTP_USER}"
+  }
+}
